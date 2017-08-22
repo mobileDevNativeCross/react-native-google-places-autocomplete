@@ -177,9 +177,10 @@ const GooglePlacesAutocomplete = React.createClass({
   },
 
   setAddressText(address) {
-    this.setState({
-      text: address
-    })
+    this.props.onSelectText(address);
+    // this.setState({
+    //   text: address
+    // })
   },
 
   getAddressText() {
@@ -344,10 +345,11 @@ const GooglePlacesAutocomplete = React.createClass({
               const details = responseJSON.result;
               this._disableRowLoaders();
               this._onBlur();
-
-              this.setState({
-                text: this._renderDescription( rowData ),
-              });
+              // console.warn('is mounted');
+              this.props.onSelectText( this._renderDescription( rowData ) );
+              // this.setState({
+              //   text: this._renderDescription( rowData ),
+              // });
 
               delete rowData.isLoading;
               this.props.onPress(rowData, details);
@@ -356,9 +358,11 @@ const GooglePlacesAutocomplete = React.createClass({
             this._disableRowLoaders();
 
             if (this.props.autoFillOnNotFound) {
-              this.setState({
-                text: this._renderDescription( rowData ),
-              });
+              // console.warn('props autoFillOnNotFound');
+              this.props.onSelectText( this._renderDescription( rowData ) );
+              // this.setState({
+              //   text: this._renderDescription( rowData ),
+              // });
               delete rowData.isLoading;
             }
 
@@ -387,10 +391,12 @@ const GooglePlacesAutocomplete = React.createClass({
 
       // display loader
       this._enableRowLoader(rowData);
+      // console.warn('if rowData id current');
+      this.props.onSelectText( this._renderDescription( rowData ) );
 
-      this.setState({
-        text: this._renderDescription( rowData ),
-      });
+      // this.setState({
+      //   text: this._renderDescription( rowData ),
+      // });
       this.triggerBlur(); // hide keyboard but not the results
 
       delete rowData.isLoading;
@@ -398,9 +404,13 @@ const GooglePlacesAutocomplete = React.createClass({
       this.getCurrentLocation();
 
     } else {
-      this.setState({
-        text: this._renderDescription( rowData ),
-      });
+      // console.warn('else rowData id current', this._renderDescription( rowData ));
+      // let result = this._renderDescription( rowData );
+      this.props.onSelectText(this._renderDescription( rowData ));
+
+      // this.setState({
+      //   text: this._renderDescription( rowData ),
+      // });
 
       this._onBlur();
 
@@ -706,7 +716,8 @@ const GooglePlacesAutocomplete = React.createClass({
   },
 
   _getListView() {
-    if ((this.state.text !== '' || this.props.predefinedPlaces.length || this.props.currentLocation === true) && this.state.listViewDisplayed === true) {
+    if ((this.props.value !== '' || this.props.predefinedPlaces.length || this.props.currentLocation === true) && this.state.listViewDisplayed === true) {
+    // if ((this.state.text !== '' || this.props.predefinedPlaces.length || this.props.currentLocation === true) && this.state.listViewDisplayed === true) {
       return (
         <ListView
           keyboardShouldPersistTaps={true}
@@ -742,8 +753,10 @@ const GooglePlacesAutocomplete = React.createClass({
             ref="textInput"
             autoFocus={this.props.autoFocus}
             style={[defaultStyles.textInput, this.props.styles.textInput]}
-            onChangeText={this._handleChangeText}
-            value={this.state.text}
+            value={this.props.value}
+            onChangeText={(text) => {this.props.onChangeText(text); this._request(text);}}
+            // onChangeText={this._handleChangeText}
+            // value={this.state.text}
             placeholder={this.props.placeholder}
             placeholderTextColor={this.props.placeholderTextColor}
             onFocus={onFocus ? () => {this._onFocus(); onFocus()} : this._onFocus}
